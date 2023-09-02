@@ -4,16 +4,21 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Determine if the app is in development mode
-const isDevelopment = process.env.NODE_ENV === 'development';
+const allowedOrigins = [
+  'http://localhost:5173', // local development
+  'https://apod-gallery-gold.vercel.app/', // production
+];
 
-// Configure CORS options
 const corsOptions = {
-  origin: isDevelopment
-    ? 'http://localhost:5173' // localhost during development
-    : 'https://apod-gallery-gold.vercel.app/', // your production client-side URL
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: 'GET',
-  credentials: true, // Add this line for handling credentials
+  credentials: true,
 };
 
 // Enable CORS with the options

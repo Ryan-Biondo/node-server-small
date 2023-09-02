@@ -10,9 +10,10 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Configure CORS options
 const corsOptions = {
   origin: isDevelopment
-    ? 'http://localhost:5174'
-    : 'https://apod-gallery-gold.vercel.app/',
+    ? 'http://localhost:5174' // localhost during development
+    : 'https://apod-gallery-gold.vercel.app/', // your production client-side URL
   methods: 'GET',
+  credentials: true, // Add this line for handling credentials
 };
 
 // Enable CORS with the options
@@ -32,5 +33,7 @@ app.get('/get-api-key/:projectName', (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}/`);
+  console.log(
+    `Server running at https://small-projects-alpha.onrender.com:${port}/`
+  ); // Changed to your Render URL
 });

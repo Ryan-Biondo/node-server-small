@@ -1,44 +1,57 @@
 require('dotenv').config();
-const cors = require('cors');
+
 const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
+
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
-const allowedOrigins = [
-  'http://localhost:5173', // local development
-  'https://apod-gallery-gold.vercel.app/', // production
-];
+// Enable CORS for all routes
+app.use(cors());
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin) || !origin) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: 'GET',
-  credentials: true,
+// Function to retrieve your NASA API key
+const getAPIKey = () => {
+  return process.env.API_KEY_APOD;
 };
 
-// Enable CORS with the options
-app.use(cors(corsOptions));
+// Function to fetch data from NASA API
+const fetchDataFromNASA = async (startDate, endDate) => {
+  const API_KEY = getAPIKey();
+  try {
+    const response = await axios.get(
+      `https://api.nasa.gov/planetary/apod?start_date=${startDate}&end_date=${endDate}&api_key=${API_KEY}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data from NASA:', error);
+    throw error;
+  }
+};
 
-// API endpoint to get API keys
-app.get('/get-api-key/:projectName', (req, res) => {
-  const { projectName } = req.params;
-  const apiKey = process.env[`API_KEY_${projectName.toUpperCase()}`];
-
-  if (apiKey) {
-    res.json({ apiKey });
+// Route to serve API key (don't actually do this, just for demonstration)
+app.get('/get-api-key/:service', (req, res) => {
+  if (req.params.service === 'APOD') {
+    res.json({ apiKey: getAPIKey() });
   } else {
-    res.status(404).json({ message: 'API key not found' });
+    res.status(400).send('Unknown service');
   }
 });
 
-// Start the server
+// Route to fetch APOD data
+app.get('/apod', async (req, res) => {
+  const startDate = req.query.start_date;
+  const endDate = req.query.end_date;
+
+  try {
+    const data = await fetchDataFromNASA(startDate, endDate);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching data from NASA:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.listen(port, () => {
-  console.log(
-    `Server running at https://small-projects-alpha.onrender.com:${port}/`
-  ); // Changed to your Render URL
+  console.log(`Server running at http://localhost:${port}/`);
 });

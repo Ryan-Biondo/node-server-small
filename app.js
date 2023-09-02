@@ -10,7 +10,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // Configure CORS options
 const corsOptions = {
   origin: isDevelopment
-    ? 'http://localhost:5174' // localhost during development
+    ? 'http://localhost:5173' // localhost during development
     : 'https://apod-gallery-gold.vercel.app/', // your production client-side URL
   methods: 'GET',
   credentials: true, // Add this line for handling credentials

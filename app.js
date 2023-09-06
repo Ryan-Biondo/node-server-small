@@ -1,8 +1,8 @@
 require('dotenv').config();
 
-import express from 'express';
-import { get } from 'axios';
-import cors from 'cors';
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -19,7 +19,7 @@ const getAPIKey = () => {
 const fetchDataFromNASA = async (startDate, endDate) => {
   const API_KEY = getAPIKey();
   try {
-    const response = await get(
+    const response = await axios.get(
       `https://api.nasa.gov/planetary/apod?start_date=${startDate}&end_date=${endDate}&api_key=${API_KEY}`
     );
     return response.data;
@@ -32,9 +32,7 @@ const fetchDataFromNASA = async (startDate, endDate) => {
 // Route to fetch APOD data
 app.get('/forward-to-nasa/apod', async (req, res) => {
   const startDate = req.query.start_date;
-  console.log('startDate:', startDate);
   const endDate = req.query.end_date;
-  console.log('endDate:', endDate);
 
   try {
     const data = await fetchDataFromNASA(startDate, endDate);

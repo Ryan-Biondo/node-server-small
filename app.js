@@ -29,13 +29,26 @@ const fetchDataFromNASA = async (startDate, endDate) => {
   }
 };
 
-// Route to fetch APOD data
+// Route to fetch APOD date range
 app.get('/forward-to-nasa/apod', async (req, res) => {
   const startDate = req.query.start_date;
   const endDate = req.query.end_date;
 
   try {
     const data = await fetchDataFromNASA(startDate, endDate);
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching data from NASA:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// Route to fetch APOD data for a specific date
+app.get('/forward-to-nasa/apod/:date', async (req, res) => {
+  const date = req.params.date;
+
+  try {
+    const data = await fetchDataFromNASA(date, date);
     res.json(data);
   } catch (error) {
     console.error('Error fetching data from NASA:', error);
